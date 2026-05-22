@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Išorinės atminties įtaisai</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a2e;
+      color: white;
+      overflow: hidden;
+    }
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: 60px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #0a0a2e 0%, #1a1a5e 50%, #0d2060 100%);
+      position: relative;
+    }
+    .slide.active { display: flex; }
+    .slide-number {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+    h1 {
+      font-size: 3.5em;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 2.2em;
+      color: #00c6ff;
+      margin-bottom: 30px;
+    }
+    h3 {
+      font-size: 1.8em;
+      color: #4fc3f7;
+      margin-bottom: 20px;
+    }
+    p, li {
+      font-size: 1.3em;
+      line-height: 1.8;
+      color: #e0e0e0;
+    }
+    ul { list-style: none; text-align: left; }
+    ul li::before { content: "✅ "; }
+    .warning li::before { content: "⚠️ "; }
+    .subtitle {
+      font-size: 1.5em;
+      color: #80cbc4;
+      margin-top: 10px;
+    }
+    .icon { font-size: 5em; margin-bottom: 20px; }
+    .card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(0,198,255,0.3);
+      border-radius: 16px;
+      padding: 30px 50px;
+      max-width: 800px;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+    th {
+      background: rgba(0,198,255,0.2);
+      padding: 12px 20px;
+      color: #00c6ff;
+      border: 1px solid rgba(0,198,255,0.3);
+    }
+    td {
+      padding: 10px 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e0e0e0;
+    }
+    tr:hover td { background: rgba(255,255,255,0.05); }
+    .highlight { color: #00e676; font-weight: bold; }
+    .nav {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 100;
+    }
+    button {
+      background: rgba(0,198,255,0.2);
+      border: 1px solid #00c6ff;
+      color: white;
+      padding: 10px 30px;
+      border-radius: 25px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover { background: rgba(0,198,255,0.5); }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      transition: width 0.4s;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      width: 100%;
+      max-width: 1000px;
+    }
+    .col-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,198,255,0.2);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: left;
+    }
+    .col-card h4 { color: #00c6ff; margin-bottom: 12px; font-size: 1.2em; }
+    .authors {
+      font-size: 1.2em;
+      color: #80cbc4;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- Skaidrė 1: Titulinis -->
+<div class="slide active" id="slide-1">
+  <div class="icon">💾</div>
+  <h1>Išorinės atminties įtaisai</h1>
+  <p class="subtitle">Technologiniai problemų sprendimai</p>
+  <p class="authors" style="margin-top:30px">👤 Naglis Gudžiūnas ir Tadas Butelinis</p>
+  <div class="slide-number">1 / 9</div>
+</div>
+
+<!-- Skaidrė 2: Kas tai? -->
+<div class="slide" id="slide-2">
+  <h2>Kas yra išorinės atminties įtaisas?</h2>
+  <div class="card">
+    <p style="font-size:1.4em; line-height:2">
+      Išorinės atminties įtaisas – tai prietaisas, naudojamas
+      <span class="highlight">duomenims saugoti už kompiuterio vidaus</span>.
+      <br><br>
+      Jie leidžia perkelti, kurti atsargines kopijas ir saugoti
+      didelius duomenų kiekius.
+    </p>
+  </div>
+  <div style="margin-top:30px; font-size:3em">🖥️ → 💾 → 💻</div>
+  <div class="slide-number">2 / 9</div>
+</div>
+
+<!-- Skaidrė 3: USB -->
+<div class="slide" id="slide-3">
+  <div class="icon">🔌</div>
+  <h2>USB atmintinė (Fleš atmintis)</h2>
+  <div class="card">
+    <ul>
+      <li>Maža, lengva, nesudaužoma</li>
+      <li>Jungiama per USB prievadą</li>
+      <li>Talpa: <span class="highlight">4 GB – 1 TB</span></li>
+      <li>Naudojama: failų perkėlimui, dokumentams, nuotraukoms</li>
+    </ul>
+  </div>
+  <div class="slide-number">3 / 9</div>
+</div>
+
+<!-- Skaidrė 4: HDD/SSD -->
+<div class="slide" id="slide-4">
+  <div class="icon">🗄️</div>
+  <h2>Išorinis kietasis diskas</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <h4>HDD (Tradicinis)</h4>
+      <ul>
+        <li>Judančios dalys</li>
+        <li>Pigesnis</li>
+        <li>Lėtesnis</li>
+        <li>Talpa iki 20 TB</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>SSD (Modernusis)</h4>
+      <ul>
+        <li>Jokių judančių dalių</li>
+        <li>Greitesnis</li>
+        <li>Patvaresnis</li>
+        <li>Talpa iki 8 TB</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">4 / 9</div>
+</div>
+
+<!-- Skaidrė 5: SD kortelė -->
+<div class="slide" id="slide-5">
+  <div class="icon">📷</div>
+  <h2>SD kortelė</h2>
+  <div class="card">
+    <ul>
+      <li>Naudojama fotoaparatuose, telefonuose, kamerose</li>
+      <li>Miniatiūrinė, tačiau didžiulė talpa</li>
+      <li>Tipai: <span class="highlight">SD, miniSD, microSD</span></li>
+      <li>Talpa: 2 GB – 1 TB</li>
+    </ul>
+  </div>
+  <div class="slide-number">5 / 9</div>
+</div>
+
+<!-- Skaidrė 6: CD/DVD -->
+<div class="slide" id="slide-6">
+  <div class="icon">💿</div>
+  <h2>CD / DVD / Blu-ray diskai</h2>
+  <div class="card">
+    <ul>
+      <li>Naudoja lazerio spindulį duomenims skaityti / rašyti</li>
+      <li>CD – iki <span class="highlight">700 MB</span></li>
+      <li>DVD – iki <span class="highlight">8,5 GB</span></li>
+      <li>Blu-ray – iki <span class="highlight">25 GB</span></li>
+    </ul>
+    <ul class="warning" style="margin-top:15px">
+      <li>Šiuo metu mažiau naudojami – pakeisti USB ir debesimis</li>
+    </ul>
+  </div>
+  <div class="slide-number">6 / 9</div>
+</div>
+
+<!-- Skaidrė 7: Palyginimas -->
+<div class="slide" id="slide-7">
+  <h2>Palyginimas</h2>
+  <div class="card" style="padding: 20px 30px">
+    <table>
+      <thead>
+        <tr>
+          <th>Įtaisas</th>
+          <th>Talpa</th>
+          <th>Greitis</th>
+          <th>Patvarumas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>💾 USB atmintinė</td><td>iki 1 TB</td><td>Vidutinis</td><td>Geras</td></tr>
+        <tr><td>🗄️ Išorinis HDD</td><td>iki 20 TB</td><td>Lėtokas</td><td>Vidutinis</td></tr>
+        <tr><td>⚡ Išorinis SSD</td><td>iki 8 TB</td><td>Greitas</td><td>Puikus</td></tr>
+        <tr><td>📷 SD kortelė</td><td>iki 1 TB</td><td>Greitas</td><td>Geras</td></tr>
+        <tr><td>💿 CD/DVD</td><td>iki 8,5 GB</td><td>Lėtas</td><td>Trapus</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-number">7 / 9</div>
+</div>
+
+<!-- Skaidrė 8: Išvados -->
+<div class="slide" id="slide-8">
+  <div class="icon">🎯</div>
+  <h2>Išvados</h2>
+  <div class="card">
+    <ul style="font-size:1.3em; line-height:2.2">
+      <li>Išorinės atminties įtaisai yra <span class="highlight">būtini šiuolaikiniame gyvenime</span></li>
+      <li>Kiekvienas įtaisas tinka <span class="highlight">skirtingoms reikmėms</span></li>
+      <li>Svarbu pasirinkti pagal <span class="highlight">talpos, greičio ir kainos</span> poreikius</li>
+    </ul>
+  </div>
+  <div class="slide-number">8 / 9</div>
+</div>
+
+<!-- Skaidrė 9: Pabaiga -->
+<div class="slide" id="slide-9">
+  <div class="icon">🎬</div>
+  <h1 style="font-size:2.5em">Ačiū už dėmesį!</h1>
+  <p class="subtitle" style="font-size:1.4em; margin-top:20px">Naglis Gudžiūnas ir Tadas Butelinis</p>
+  <p style="margin-top:30px; opacity:0.6; font-size:1.1em">Tema C: Išorinės atminties įtaisai</p>
+  <div class="slide-number">9 / 9</div>
+</div>
+
+<!-- Navigacija -->
+<div class="nav">
+  <button onclick="prevSlide()">◀ Atgal</button>
+  <button onclick="nextSlide()">Pirmyn ▶</button>
+</div>
+
+<script>
+  let current = 1;
+  const total = 9;
+
+  function showSlide(n) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    document.getElementById('slide-' + n).classList.add('active');
+    document.getElementById('progress').style.width = (n / total * 100) + '%';
+  }
+
+  function nextSlide() {
+    if (current < total) { current++; showSlide(current); }
+  }
+
+  function prevSlide() {
+    if (current > 1) { current--; showSlide(current); }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+  });
+
+  showSlide(1);
+</script>
+
+</body>
+</html>
