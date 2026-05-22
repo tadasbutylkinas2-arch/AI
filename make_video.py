@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-from moviepy import ImageSequenceClip, concatenate_videoclips
+from moviepy import ImageSequenceClip, concatenate_videoclips, AudioArrayClip
 
 W, H = 1280, 720
 FPS = 24
@@ -119,11 +119,10 @@ def typing_slide(title, bullets, duration, lh=54):
 
 def slide_title(duration=6):
     img, d = new_frame()
-    centered_text(d, "Išorinės atminties įtaisai", 195, 54, color=BLUE)
-    accent_line(d, 270)
-    centered_text(d, "Technologinių problemų sprendimai", 290, 30, color=TEAL, bold=False)
-    centered_text(d, "Naglis Gudžiūnas ir Tadas Butelinis", 355, 28, color=GREY,  bold=False)
-    centered_text(d, "Tema C", 560, 24, color=GREY, bold=False)
+    centered_text(d, "Išorinės atminties įtaisai", 220, 54, color=BLUE)
+    accent_line(d, 295)
+    centered_text(d, "Technologinių problemų sprendimai", 315, 30, color=TEAL, bold=False)
+    centered_text(d, "Tadas Butylkinas ir Naglis Gudžiūnas", 375, 28, color=GREY, bold=False)
     arr = np.array(img)
     return [arr] * int(duration * FPS)
 
@@ -355,10 +354,9 @@ def slide_conclusions(duration=7):
 
 def slide_end(duration=4):
     img, d = new_frame()
-    centered_text(d, "Ačiū už dėmesį!", 245, 58, color=BLUE)
-    accent_line(d, 322)
-    centered_text(d, "Naglis Gudžiūnas ir Tadas Butelinis", 345, 30, color=TEAL, bold=False)
-    centered_text(d, "Tema C: Išorinės atminties įtaisai",  398, 24, color=GREY, bold=False)
+    centered_text(d, "Ačiū už dėmesį!", 265, 58, color=BLUE)
+    accent_line(d, 342)
+    centered_text(d, "Tadas Butylkinas ir Naglis Gudžiūnas", 365, 30, color=TEAL, bold=False)
     arr = np.array(img)
     return [arr] * int(duration * FPS)
 
@@ -386,14 +384,103 @@ for i, builder in enumerate(builders):
     all_frames.extend(frames)
     print(f"  Slide {i+1}/{len(builders)}  ({len(frames)} frames)")
 
-print(f"Total frames: {len(all_frames)}  (~{len(all_frames)/FPS:.1f}s)")
+SAMPLE_RATE = 44100
+total_duration = len(all_frames) / FPS
+print(f"Total frames: {len(all_frames)}  (~{total_duration:.1f}s)")
+
+# ── Generate ambient background music ────────────────────────────────────────
+print("Generating music...")
+
+def piano_note(freq, dur, sr=SAMPLE_RATE, vol=0.18):
+    """Soft piano tone: sine + harmonics + ADSR envelope."""
+    t = np.linspace(0, dur, int(sr * dur), endpoint=False)
+    wave = (np.sin(2*np.pi*freq*t)
+            + 0.5  * np.sin(2*np.pi*2*freq*t)
+            + 0.25 * np.sin(2*np.pi*3*freq*t)
+            + 0.12 * np.sin(2*np.pi*4*freq*t))
+    # ADSR envelope
+    attack  = int(0.01 * sr)
+    decay   = int(0.05 * sr)
+    release = int(0.25 * dur * sr)
+    sustain_level = 0.6
+    env = np.ones(len(t))
+    env[:attack] = np.linspace(0, 1, attack)
+    env[attack:attack+decay] = np.linspace(1, sustain_level, decay)
+    env[-release:] = np.linspace(sustain_level, 0, release)
+    return wave * env * vol
+
+def note_freq(name):
+    notes = {"C3":130.81,"D3":146.83,"E3":164.81,"F3":174.61,"G3":196.00,
+             "A3":220.00,"B3":246.94,"C4":261.63,"D4":293.66,"E4":329.63,
+             "F4":349.23,"G4":392.00,"A4":440.00,"B4":493.88,"C5":523.25,
+             "D5":587.33,"E5":659.25,"F5":698.46,"G5":783.99,"A5":880.00}
+    return notes[name]
+
+# Chord progression: Am – F – C – G  (looped), each chord 2 seconds
+chord_prog = [
+    ["A3","C4","E4"],   # Am
+    ["F3","A3","C4"],   # F
+    ["C3","E3","G3"],   # C (major but gentle)
+    ["G3","B3","D4"],   # G
+]
+chord_dur = 2.0
+melody_notes = [
+    ("E5",0.5),("D5",0.5),("C5",0.5),("E5",0.5),
+    ("A5",0.5),("G5",0.5),("F5",0.5),("E5",0.5),
+    ("D5",0.5),("C5",0.5),("D5",0.5),("E5",0.5),
+    ("C5",0.5),("C5",0.5),("B4",0.5),("C5",0.5),
+]
+
+total_samples = int(SAMPLE_RATE * total_duration)
+audio = np.zeros(total_samples)
+
+# Layer chords looped over entire duration
+t = 0.0
+ci = 0
+while t < total_duration:
+    chord = chord_prog[ci % len(chord_prog)]
+    for note in chord:
+        dur = min(chord_dur, total_duration - t)
+        if dur > 0.1:
+            seg = piano_note(note_freq(note), dur, vol=0.10)
+            start = int(t * SAMPLE_RATE)
+            audio[start:start+len(seg)] += seg
+    ci += 1
+    t += chord_dur
+
+# Layer melody (softer, runs once then loops)
+t = 0.0
+mi = 0
+while t < total_duration:
+    name, dur = melody_notes[mi % len(melody_notes)]
+    actual = min(dur, total_duration - t)
+    if actual > 0.05:
+        seg = piano_note(note_freq(name), actual, vol=0.13)
+        start = int(t * SAMPLE_RATE)
+        audio[start:start+len(seg)] += seg
+    mi += 1
+    t += dur
+
+# Fade in / fade out
+fade = int(1.5 * SAMPLE_RATE)
+audio[:fade] *= np.linspace(0, 1, fade)
+audio[-fade:] *= np.linspace(1, 0, fade)
+
+# Normalise to avoid clipping
+audio = audio / (np.max(np.abs(audio)) + 1e-9) * 0.85
+
+# Convert to stereo float32
+stereo = np.stack([audio, audio], axis=1).astype(np.float32)
+audio_clip = AudioArrayClip(stereo, fps=SAMPLE_RATE)
+
 print("Writing MP4...")
 clip = ImageSequenceClip(all_frames, fps=FPS)
+clip = clip.with_audio(audio_clip)
 clip.write_videofile(
     "/home/user/AI/isiorines_atminties_itaisai.mp4",
     fps=FPS,
     codec="libx264",
-    audio=False,
+    audio_codec="aac",
     logger=None,
 )
 print("Done!")
